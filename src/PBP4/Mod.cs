@@ -13,6 +13,7 @@ namespace PBP4
             manager.Register(new DisplayManager());
             manager.Register(new Offset());
             manager.Register(new Scale());
+            manager.Register(new BlockID());
 		}
 	}
 }

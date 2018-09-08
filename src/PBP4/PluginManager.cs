@@ -12,7 +12,10 @@ namespace PBP4
     public class PluginManager : SingleInstance<PluginManager>
     {
         public override string Name => "PBP4 Plugins";
-        private List<PluginData> plugins = new List<PluginData>();
+        private List<PluginData> _plugins = new List<PluginData>();
+
+        private List<KeyValuePair<Plugin, bool>> _pluginQueue =
+            new List<KeyValuePair<Plugin, bool>>();
 
         private void Start()
         {
@@ -37,7 +40,7 @@ namespace PBP4
         public void SaveAll()
         {
             ModConsole.Log("Saving PBP4 Plugins..");
-            foreach (var pluginData in plugins)
+            foreach (var pluginData in _plugins)
             {
                 try
                 {
@@ -75,17 +78,17 @@ namespace PBP4
         private void ReloadAll()
         {
             //Tell modloader to reload configuration here
-            for (int i = 0; i < plugins.Count; i++)
+            for (int i = 0; i < _plugins.Count; i++)
             {
                 try
                 {
-                    var data = plugins[i];
-                    data.Input = Load(plugins[i].Plugin);
-                    plugins[i] = data;
+                    var data = _plugins[i];
+                    data.Input = Load(_plugins[i].Plugin);
+                    _plugins[i] = data;
                 }
                 catch (Exception e)
                 {
-                    ModConsole.Log("Failed to reload plugin \"{0}\":\n{1}", plugins[i].Name, e);
+                    ModConsole.Log("Failed to reload plugin \"{0}\":\n{1}", _plugins[i].Name, e);
                 }
             }
         }
@@ -130,6 +133,24 @@ namespace PBP4
 
         public void Register(Plugin plugin)
         {
+            if (plugin == null)
+            {
+                throw new ArgumentNullException("plugin");
+            }
+            _pluginQueue.Add(new KeyValuePair<Plugin, bool>(plugin, true));
+        }
+
+        public void UnRegister(Plugin plugin)
+        {
+            if (plugin == null)
+            {
+                throw new ArgumentNullException("plugin");
+            }
+            _pluginQueue.Add(new KeyValuePair<Plugin, bool>(plugin, false));
+        }
+
+        private void RegisterInternal(Plugin plugin)
+        {
             var input = Load(plugin);
 
             ///These two values are used as pointers!
@@ -150,6 +171,21 @@ namespace PBP4
                                 (single) =>
                                 {
                                     input.Write(data.Key, (float)single);
+                                    valueInfo.ValueChanged = true;
+                                },
+                                true
+                            )
+                        );
+                        break;
+                    case "Integer":
+                        uiObjects.Add(new UIObject(data.Key));
+                        uiObjects.Add(
+                            new UIObject(
+                                (float)(int)data.RawValue,
+                                null,
+                                (single) =>
+                                {
+                                    input.Write(data.Key, (int)(float)single);
                                     valueInfo.ValueChanged = true;
                                 },
                                 true
@@ -292,27 +328,54 @@ namespace PBP4
                    valueInfo
                );
             DefaultPlugins.DisplayManager.RegisterPlugin(pluginData);
-            plugins.Add(pluginData);
+            _plugins.Add(pluginData);
         }
 
-        public void UnRegister(Plugin plugin)
+        private void UnRegisterInternal(Plugin plugin)
         {
-            for (int i = plugins.Count - 1; i >= 0; i--)
+            for (int i = _plugins.Count - 1; i >= 0; i--)
             {
-                if (plugins[i].Plugin == plugin)
+                if (_plugins[i].Plugin == plugin)
                 {
                     DefaultPlugins.DisplayManager
-                                  .UnregisterPlugin(plugins[i].UIContainer);
-                    Save(plugins[i]);
-                    plugins.RemoveAt(i);
+                                  .UnregisterPlugin(_plugins[i].UIContainer);
+                    Save(_plugins[i]);
+                    _plugins.RemoveAt(i);
                 }
             }
         }
-
+        
         private void Update()
         {
+            var pluginQueue = 
+                new List<KeyValuePair<Plugin, bool>>(_pluginQueue);
+            _pluginQueue.Clear();
+            foreach(var pair in pluginQueue)
+            {
+                try
+                {
+                    if (pair.Value)
+                    {
+                        RegisterInternal(pair.Key);
+                    }
+                    else
+                    {
+                        UnRegisterInternal(pair.Key);
+                    }
+                }
+                catch(Exception e)
+                {
+                    ModConsole.Log(
+                        "Failed to load plugin {0} ({1}):\n{2}",
+                        pair.Key.Name,
+                        pair.Key.Key,
+                        e
+                    );
+                }
+            }
+
             var manager = UIManager.Instance;
-            foreach (var data in plugins)
+            foreach (var data in _plugins)
             {
                 manager.AddInterface(
                     data.UIContainer

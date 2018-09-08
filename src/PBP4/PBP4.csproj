@@ -51,6 +51,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DefaultPlugins\BlockID.cs" />
     <Compile Include="DefaultPlugins\DisplayManager.cs" />
     <Compile Include="DefaultPlugins\Offset.cs" />
     <Compile Include="DefaultPlugins\Scale.cs" />
