@@ -102,6 +102,10 @@ namespace PBP4
             {
                 plugin.Enabled = false;
             }
+            if (plugin is DefaultPlugins.DisplayManager)
+            {
+                plugin.Enabled = true;
+            }
 
             var input = plugin.DefaultInput;
             foreach (var data in input.ReadAll())
