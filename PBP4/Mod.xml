@@ -1,0 +1,23 @@
+<Mod>
+	<Name>Precision Building Project 4</Name>
+	<Author>ITR</Author>
+	<Version>0.1.0</Version>
+	
+	<Description>
+Build the machines of your dreams!
+(This mod is under development, please excuse any lack of features)
+	</Description>
+	<Icon name="icon" />
+	<Debug>false</Debug>
+	<MultiplayerCompatible>true</MultiplayerCompatible>
+	<Assemblies>
+		<Assembly path="PBP4.dll" />
+	</Assemblies>
+	<Keys>
+		
+	</Keys>
+	<Resources>
+		<Texture name="icon" path="icon.png" />
+	</Resources>
+	<ID>1ea4c0b2-e306-4e3a-84c5-f9d8a06518ae</ID>
+</Mod>
