@@ -23,7 +23,7 @@ namespace PBP4.DefaultPlugins
             if (input.HasKey("BlockID"))
             {
                 var blockType = input.ReadInt("BlockID");
-                AddPiece.Instance.SetBlockType((BlockType)blockType);
+                AddPiece.Instance?.SetBlockType((BlockType)blockType);
             }
         }
 
