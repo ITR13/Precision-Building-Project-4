@@ -117,7 +117,8 @@ namespace PBP4.UI
                     var newValue = window.Draw(
                         j,
                         true,
-                        uiObject.Value
+                        uiObject.Value,
+                        uiObject.Text
                     );
 
                     if (uiObject.Value == null)

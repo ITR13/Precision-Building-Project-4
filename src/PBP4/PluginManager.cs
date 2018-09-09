@@ -323,7 +323,7 @@ namespace PBP4
                 uiObjects.Add(
                     new UIObject(
                         null,
-                        null,
+                        "Apply",
                         (b) =>
                         {
                             valueInfo.WasApplied |=
@@ -423,11 +423,10 @@ namespace PBP4
                     (rule == ApplyRule.OnChange && data.ValueInfo.ValueChanged)
                 )
                 {
-                    data.ValueInfo.WasApplied = false;
                     data.ValueInfo.ValueChanged = false;
                     data.Plugin.Apply(data.Input);
                 }
-
+                data.ValueInfo.WasApplied = false;
             }
         }
     }
