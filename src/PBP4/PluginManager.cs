@@ -131,6 +131,25 @@ namespace PBP4
             return input;
         }
 
+        public void UpdateDataAndUI(Plugin plugin, XDataHolder holder)
+        {
+            for (int i = 0; i < _plugins.Count; i++)
+            {
+                if (_plugins[i].Plugin != plugin)
+                {
+                    continue;
+                }
+                holder.Write(_plugins[i].Input);
+                var uiObjects = GetObjects(
+                    plugin,
+                    _plugins[i].Input,
+                    _plugins[i].ValueInfo
+                );
+                _plugins[i].UIContainer.UIObjects = uiObjects;
+            }
+
+        }
+
         public void Register(Plugin plugin)
         {
             if (plugin == null)
@@ -155,7 +174,50 @@ namespace PBP4
 
             ///These two values are used as pointers!
             var valueInfo = new ValueInfo();
+            var uiObjects = GetObjects(plugin, input, valueInfo);
 
+            var config = Configuration.GetData();
+
+            var position = new Vector2(300, 300);
+            var positionKey = "_" + plugin.GetKey("ui_position");
+            if (config.HasKey(positionKey))
+            {
+                position = config.ReadVector3(positionKey);
+            }
+
+            var display = true;
+            var displayKey = "_" + plugin.GetKey("display");
+            if (config.HasKey(displayKey))
+            {
+                display = config.ReadBool(displayKey);
+            }
+
+            var uiContainer = new UIContainer(
+                position,
+                plugin.Key,
+                plugin.Name,
+                uiObjects.ToArray(),
+                display
+            );
+
+            var pluginData =
+               new PluginData(
+                   plugin.Key,
+                   plugin,
+                   input,
+                   uiContainer,
+                   valueInfo
+               );
+            DefaultPlugins.DisplayManager.RegisterPlugin(pluginData);
+            _plugins.Add(pluginData);
+        }
+
+        private UIObject[] GetObjects(
+            Plugin plugin, 
+            XDataHolder input,
+            ValueInfo valueInfo
+        )
+        {
             ///Create UI elements for each input
             var uiObjects = new List<UIObject>();
             foreach (var data in input.ReadAll())
@@ -295,40 +357,7 @@ namespace PBP4
                 );
             }
 
-            var config = Configuration.GetData();
-
-            var position = new Vector2(300, 300);
-            var positionKey = "_" + plugin.GetKey("ui_position");
-            if (config.HasKey(positionKey))
-            {
-                position = config.ReadVector3(positionKey);
-            }
-
-            var display = true;
-            var displayKey = "_" + plugin.GetKey("display");
-            if (config.HasKey(displayKey))
-            {
-                display = config.ReadBool(displayKey);
-            }
-
-            var uiContainer = new UIContainer(
-                position,
-                plugin.Key,
-                plugin.Name,
-                uiObjects.ToArray(),
-                display
-            );
-
-            var pluginData =
-               new PluginData(
-                   plugin.Key,
-                   plugin,
-                   input,
-                   uiContainer,
-                   valueInfo
-               );
-            DefaultPlugins.DisplayManager.RegisterPlugin(pluginData);
-            _plugins.Add(pluginData);
+            return uiObjects.ToArray();
         }
 
         private void UnRegisterInternal(Plugin plugin)
@@ -344,13 +373,13 @@ namespace PBP4
                 }
             }
         }
-        
+
         private void Update()
         {
-            var pluginQueue = 
+            var pluginQueue =
                 new List<KeyValuePair<Plugin, bool>>(_pluginQueue);
             _pluginQueue.Clear();
-            foreach(var pair in pluginQueue)
+            foreach (var pair in pluginQueue)
             {
                 try
                 {
@@ -363,7 +392,7 @@ namespace PBP4
                         UnRegisterInternal(pair.Key);
                     }
                 }
-                catch(Exception e)
+                catch (Exception e)
                 {
                     ModConsole.Log(
                         "Failed to load plugin {0} ({1}):\n{2}",
