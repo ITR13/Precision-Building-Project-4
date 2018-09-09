@@ -412,6 +412,7 @@ namespace PBP4
 
                 if (!data.Plugin.Enabled)
                 {
+                    data.ValueInfo.WasApplied = false;
                     continue;
                 }
                 var rule = (ApplyRule)(
