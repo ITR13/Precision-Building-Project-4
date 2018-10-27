@@ -1,6 +1,7 @@
 ﻿using Modding;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using UnityEngine;
@@ -92,9 +93,17 @@ namespace PBP4.UI
                                     newFloat
                                 );
                                 _floats[id] = data;
+                                if (string.IsNullOrEmpty(newFloat))
+                                {
+                                    return 0f;
+                                }
+                                
                                 try
                                 {
-                                    return float.Parse(newFloat);
+                                    return float.Parse(
+                                        newFloat,
+                                        CultureInfo.InvariantCulture
+                                );
                                 }
                                 catch { }
                             }
