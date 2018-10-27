@@ -10,6 +10,10 @@ namespace PBP4.DefaultPlugins
 {
     public class Scale : Plugin
     {
+        private GameObject _easyScale;
+        public bool EasyScale => _easyScale
+                              || (_easyScale = GameObject.Find("EasyScale"));
+
         public override ApplyRule ApplyRule => ApplyRule.OnChange;
 
         public override XDataHolder DefaultInput => new XDataHolderFactory()
@@ -39,7 +43,14 @@ namespace PBP4.DefaultPlugins
 
         private void ScaleBlock(Block block)
         {
-            block.GameObject.transform.localScale = _scale;
+            var blockBehaviour = 
+                block.GameObject.GetComponent<BlockBehaviour>();
+            if (blockBehaviour == null)
+            {
+                ModConsole.Log($"BlockBehaviour Was missing from {block}!");
+                return;
+            }
+            blockBehaviour.SetScale(_scale);
         }
     }
 }
