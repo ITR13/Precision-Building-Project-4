@@ -55,6 +55,7 @@
     <Compile Include="DefaultPlugins\DisplayManager.cs" />
     <Compile Include="DefaultPlugins\Offset.cs" />
     <Compile Include="DefaultPlugins\Scale.cs" />
+    <Compile Include="DefaultPlugins\TranslateMachine.cs" />
     <Compile Include="PluginManager.cs" />
     <Compile Include="Mod.cs" />
     <Compile Include="Plugin.cs" />
