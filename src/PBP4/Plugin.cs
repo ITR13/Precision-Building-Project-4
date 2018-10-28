@@ -116,10 +116,10 @@ namespace PBP4
         /// </summary>
         Constant,
 
-        //NB: Keep this a power of 2!
+        //NB: Keep these a power of 2!
         /// <summary>
         /// Do a binary or with this to make the Enable button not appear
         /// </summary>
-        NoEnable,
+        NoEnable = 4,
     }
 }

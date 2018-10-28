@@ -123,10 +123,6 @@ namespace PBP4
                     );
                 }
             }
-            if (plugin.Enabled)
-            {
-                plugin.Apply(input);
-            }
 
             return input;
         }
