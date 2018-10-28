@@ -59,9 +59,10 @@ namespace PBP4.DefaultPlugins
                     end = Translate(end);
                 }
 
+                
                 var transform = block.transform;
-                transform.position = Translate(transform.position);
-                transform.rotation = rotation * transform.rotation;
+                block.SetPosition(Translate(transform.position));
+                block.SetRotation(rotation * transform.rotation);
                 block.SetScale(
                     transform.InverseTransformVector(
                         Vector3.Scale(
